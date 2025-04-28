@@ -24,6 +24,7 @@ namespace LogFormatter
 
             if (filePath is null || !_parsers.ContainsKey(fileType!.Value))
             {
+                await WriteProblemFile(filePath);
                 return null;
             }
 
@@ -46,6 +47,20 @@ namespace LogFormatter
             }
 
             return date.Contains('-') ? FileType.SecondFormat : FileType.FirstFormat;
+        }
+
+        private async Task WriteProblemFile(string filePath)
+        {
+            string[] lines;
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                lines = (await reader.ReadToEndAsync()).Split('\n');
+            }
+
+            foreach (var line in lines)
+            {
+                await LogWriter.WriteProblemLogAsync(line);
+            }
         }
     }
 }
